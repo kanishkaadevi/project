@@ -18,9 +18,15 @@
             <a href="/" class="nav-item active">👥 All Users</a>
             <a href="#add-form" class="nav-item">➕ Add User</a>
         </nav>
-        <div class="sidebar-footer">
-            <p>Total Users</p>
-            <h2>{{ users|length }}</h2>
+        <div class="sidebar-stats">
+            <div class="stat-box">
+                <p>Total Users</p>
+                <h2>{{ total }}</h2>
+            </div>
+            <div class="stat-box">
+                <p>Cities</p>
+                <h2>{{ cities }}</h2>
+            </div>
         </div>
     </div>
 
@@ -30,14 +36,47 @@
                 <h1>User Management</h1>
                 <p>Manage all registered users</p>
             </div>
+            <form method="GET" class="search-form">
+                <input type="text" name="search" placeholder="🔍 Search by name, email or city..." value="{{ search }}">
+                <button type="submit">Search</button>
+                {% if search %}
+                <a href="/" class="clear-btn">Clear</a>
+                {% endif %}
+            </form>
         </div>
 
         <div class="content">
 
+            <!-- Stats Cards -->
+            <div class="stats-row">
+                <div class="stat-card purple">
+                    <div class="stat-icon">👥</div>
+                    <div>
+                        <h3>{{ total }}</h3>
+                        <p>Total Users</p>
+                    </div>
+                </div>
+                <div class="stat-card blue">
+                    <div class="stat-icon">🏙️</div>
+                    <div>
+                        <h3>{{ cities }}</h3>
+                        <p>Cities</p>
+                    </div>
+                </div>
+                <div class="stat-card green">
+                    <div class="stat-icon">✅</div>
+                    <div>
+                        <h3>{{ users|length }}</h3>
+                        <p>Showing Now</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add User Form -->
             <div class="card" id="add-form">
                 <div class="card-header">
-                    <h2>Add New User</h2>
-                    <p>Fill in the details below to register a new user</p>
+                    <h2>➕ Add New User</h2>
+                    <p>Fill in all details to register a new user</p>
                 </div>
                 <form method="POST" class="form">
                     <div class="form-row">
@@ -50,14 +89,31 @@
                             <input type="email" name="email" placeholder="Enter email address" required>
                         </div>
                     </div>
-                    <button type="submit" class="btn-primary">Add User</button>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Phone Number</label>
+                            <input type="text" name="phone" placeholder="Enter phone number">
+                        </div>
+                        <div class="form-group">
+                            <label>Age</label>
+                            <input type="number" name="age" placeholder="Enter age" min="1" max="120">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>City</label>
+                            <input type="text" name="city" placeholder="Enter city">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-primary">➕ Add User</button>
                 </form>
             </div>
 
+            <!-- Users Table -->
             <div class="card">
                 <div class="card-header">
-                    <h2>All Users</h2>
-                    <p>{{ users|length }} user(s) registered</p>
+                    <h2>👥 All Users</h2>
+                    <p>{{ users|length }} user(s) found</p>
                 </div>
 
                 {% if users %}
@@ -67,8 +123,11 @@
                             <th>#</th>
                             <th>Name</th>
                             <th>Email</th>
+                            <th>Phone</th>
+                            <th>Age</th>
+                            <th>City</th>
                             <th>Joined</th>
-                            <th>Action</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -82,9 +141,13 @@
                                 </div>
                             </td>
                             <td>{{ user.email }}</td>
+                            <td>{{ user.phone or 'N/A' }}</td>
+                            <td>{{ user.age or 'N/A' }}</td>
+                            <td>{{ user.city or 'N/A' }}</td>
                             <td>{{ user.created_at[:10] if user.created_at else 'N/A' }}</td>
-                            <td>
-                                <a href="/delete/{{ user.id }}" class="btn-delete" onclick="return confirm('Delete this user?')">Delete</a>
+                            <td class="actions">
+                                <a href="/edit/{{ user.id }}" class="btn-edit">✏️ Edit</a>
+                                <a href="/delete/{{ user.id }}" class="btn-delete" onclick="return confirm('Delete this user?')">🗑️ Delete</a>
                             </td>
                         </tr>
                         {% endfor %}
@@ -93,8 +156,8 @@
                 {% else %}
                 <div class="empty">
                     <p>👤</p>
-                    <h3>No users yet</h3>
-                    <p>Add your first user using the form above</p>
+                    <h3>No users found</h3>
+                    <p>{% if search %}No results for "{{ search }}"{% else %}Add your first user above{% endif %}</p>
                 </div>
                 {% endif %}
             </div>
